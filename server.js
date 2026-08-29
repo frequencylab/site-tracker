@@ -735,8 +735,6 @@ app.get("*", (req, res) => {
 });
 
 // ─── Start server ───
-app.listen(PORT, () => {
-  console.log(`\n🚀 Site Tracker running at http://localhost:${PORT}`);
-  console.log(`📊 Dashboard: http://localhost:${PORT}`);
-  console.log(`\n${useInMemory ? "💾 Using in-memory storage" : "☁️  Connected to Supabase"}\n`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Site Tracker running at http://0.0.0.0:${PORT}`);
 });
