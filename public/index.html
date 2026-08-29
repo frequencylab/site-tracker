@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Tracker — Your Portfolio Analytics</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="navigateTo('dashboard')">
+      <span class="brand-icon">◈</span>
+      <span class="brand-text">Site Tracker</span>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-page="dashboard" onclick="navigateTo('dashboard')">Dashboard</a>
+      <a href="#" class="nav-link" data-page="analytics" onclick="navigateTo('analytics')" id="nav-analytics" style="display:none">Analytics</a>
+      <a href="#" class="nav-link" data-page="alerts" onclick="navigateTo('alerts')">🔔 Alerts</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container">
+    <!-- Dashboard View -->
+    <div id="view-dashboard" class="view active">
+      <!-- Stats Overview -->
+      <div class="stats-overview">
+        <div class="stat-card">
+          <div class="stat-icon">🌐</div>
+          <div class="stat-info">
+            <span class="stat-value" id="total-sites">0</span>
+            <span class="stat-label">Total Sites</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👁️</div>
+          <div class="stat-info">
+            <span class="stat-value" id="total-views">0</span>
+            <span class="stat-label">Total Page Views</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="total-visitors">0</span>
+            <span class="stat-label">Unique Visitors</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <span class="stat-value" id="active-sites">0</span>
+            <span class="stat-label">Active Sites</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Site Button -->
+      <div class="section-header">
+        <h2>Your Sites</h2>
+        <button class="btn btn-primary" onclick="openAddSiteModal()">
+          <span>+</span> Add Site
+        </button>
+      </div>
+
+      <!-- Sites Grid -->
+      <div class="sites-grid" id="sites-grid">
+        <div class="loading">Loading sites...</div>
+      </div>
+    </div>
+
+    <!-- Analytics View -->
+    <div id="view-analytics" class="view">
+      <div class="analytics-header">
+        <button class="btn btn-ghost" onclick="navigateTo('dashboard')">← Back</button>
+        <h2 id="analytics-site-name">Analytics</h2>
+        <div class="period-selector">
+          <button class="period-btn active" data-period="24h" onclick="setPeriod('24h')">24h</button>
+          <button class="period-btn" data-period="7d" onclick="setPeriod('7d')">7 Days</button>
+          <button class="period-btn" data-period="30d" onclick="setPeriod('30d')">30 Days</button>
+          <button class="period-btn" data-period="90d" onclick="setPeriod('90d')">90 Days</button>
+        </div>
+      </div>
+
+      <!-- Analytics Stats -->
+      <div class="stats-overview">
+        <div class="stat-card">
+          <div class="stat-icon">👁️</div>
+          <div class="stat-info">
+            <span class="stat-value" id="analytics-views">0</span>
+            <span class="stat-label">Page Views</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="analytics-visitors">0</span>
+            <span class="stat-label">Unique Visitors</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <h3>Views Over Time</h3>
+        <canvas id="views-chart" width="800" height="300"></canvas>
+        <div id="chart-empty" class="chart-empty" style="display:none">
+          No data yet. Add the tracking script to your site to start collecting analytics.
+        </div>
+      </div>
+
+      <!-- Tables -->
+      <div class="analytics-tables">
+        <div class="table-card">
+          <h3>Top Pages</h3>
+          <table class="data-table">
+            <thead>
+              <tr><th>Page</th><th>Views</th></tr>
+            </thead>
+            <tbody id="top-pages-body">
+              <tr><td colspan="2" class="empty-row">No data yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-card">
+          <h3>Top Referrers</h3>
+          <table class="data-table">
+            <thead>
+              <tr><th>Source</th><th>Views</th></tr>
+            </thead>
+            <tbody id="top-referrers-body">
+              <tr><td colspan="2" class="empty-row">No data yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tracking Script -->
+      <div class="tracking-script-card">
+        <h3>📡 Tracking Script</h3>
+        <p>Embed this script on your site before the closing <code>&lt;/body&gt;</code> tag to start tracking.</p>
+        <div class="code-block">
+          <code id="tracking-code"></code>
+          <button class="btn btn-small" onclick="copyTrackingScript()">Copy</button>
+        </div>
+      </div>
+    </div>
+    <!-- Alerts View -->
+    <div id="view-alerts" class="view">
+      <div class="section-header">
+        <h2>🔔 Alerts & Monitoring</h2>
+        <button class="btn btn-primary" onclick="sendTestAlert()">Send Test Alert</button>
+      </div>
+
+      <!-- Monitoring Status -->
+      <div class="stats-overview" id="health-grid"></div>
+
+      <!-- Alert Configuration -->
+      <div class="alerts-config">
+        <!-- Downtime Monitoring -->
+        <div class="alert-config-card">
+          <div class="alert-config-header">
+            <div>
+              <h3>🏥 Downtime Monitoring</h3>
+              <p class="text-muted">Ping each site periodically to detect downtime</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="health-enabled" onchange="updateAlertConfig()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="alert-config-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Check Interval (minutes)</label>
+                <input type="number" id="health-interval" value="5" min="1" max="60" onchange="updateAlertConfig()">
+              </div>
+              <div class="form-group">
+                <label>Timeout (seconds)</label>
+                <input type="number" id="health-timeout" value="10" min="1" max="30" onchange="updateAlertConfig()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View Threshold -->
+        <div class="alert-config-card">
+          <div class="alert-config-header">
+            <div>
+              <h3>📈 Daily View Threshold</h3>
+              <p class="text-muted">Get notified when a site exceeds a daily page view limit</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="threshold-enabled" onchange="updateAlertConfig()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="alert-config-body">
+            <div class="form-group" style="max-width:300px">
+              <label>Daily View Limit</label>
+              <input type="number" id="threshold-limit" value="1000" min="1" onchange="updateAlertConfig()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Email Config -->
+        <div class="alert-config-card">
+          <div class="alert-config-header">
+            <div>
+              <h3>📧 Email Alerts</h3>
+              <p class="text-muted">Send alert notifications via email (SMTP)</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="email-enabled" onchange="updateAlertConfig()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="alert-config-body">
+            <div class="form-group">
+              <label>Recipient Email</label>
+              <input type="email" id="email-to" placeholder="you@example.com" onchange="updateAlertConfig()">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>SMTP Host</label>
+                <input type="text" id="email-smtp-host" placeholder="smtp.gmail.com" onchange="updateAlertConfig()">
+              </div>
+              <div class="form-group">
+                <label>SMTP Port</label>
+                <input type="number" id="email-smtp-port" value="587" onchange="updateAlertConfig()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>SMTP User</label>
+                <input type="text" id="email-smtp-user" placeholder="you@gmail.com" onchange="updateAlertConfig()">
+              </div>
+              <div class="form-group">
+                <label>SMTP Password</label>
+                <input type="password" id="email-smtp-pass" placeholder="••••••••" onchange="updateAlertConfig()">
+              </div>
+            </div>
+            <label class="checkbox-label">
+              <input type="checkbox" id="email-smtp-secure" onchange="updateAlertConfig()">
+              Use TLS/SSL (port 465)
+            </label>
+          </div>
+        </div>
+
+        <!-- Slack Config -->
+        <div class="alert-config-card">
+          <div class="alert-config-header">
+            <div>
+              <h3>💬 Slack Alerts</h3>
+              <p class="text-muted">Send alert notifications to a Slack channel via webhook</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="slack-enabled" onchange="updateAlertConfig()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="alert-config-body">
+            <div class="form-group">
+              <label>Webhook URL</label>
+              <input type="url" id="slack-webhook" placeholder="https://hooks.slack.com/services/T.../B.../xxx" onchange="updateAlertConfig()">
+            </div>
+            <div class="form-group" style="max-width:300px">
+              <label>Channel (optional)</label>
+              <input type="text" id="slack-channel" placeholder="#alerts" onchange="updateAlertConfig()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert History -->
+      <div class="table-card" style="margin-top:1.5rem">
+        <h3>📋 Alert History</h3>
+        <table class="data-table">
+          <thead>
+            <tr><th>Type</th><th>Site</th><th>Message</th><th>Time</th></tr>
+          </thead>
+          <tbody id="alert-history-body">
+            <tr><td colspan="4" class="empty-row">No alerts yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Site Modal -->
+  <div class="modal-overlay" id="site-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Add New Site</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="site-form" onsubmit="saveSite(event)">
+        <input type="hidden" id="site-id">
+        <div class="form-group">
+          <label for="site-name">Site Name *</label>
+          <input type="text" id="site-name" required placeholder="My Awesome Project">
+        </div>
+        <div class="form-group">
+          <label for="site-url">URL *</label>
+          <input type="url" id="site-url" required placeholder="https://example.com">
+        </div>
+        <div class="form-group">
+          <label for="site-description">Description</label>
+          <textarea id="site-description" placeholder="A brief description of this project..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="site-thumbnail">Thumbnail URL</label>
+          <input type="url" id="site-thumbnail" placeholder="https://example.com/screenshot.png">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="site-category">Category</label>
+            <select id="site-category">
+              <option value="portfolio">Portfolio</option>
+              <option value="ecommerce">E-Commerce</option>
+              <option value="blog">Blog</option>
+              <option value="saas">SaaS</option>
+              <option value="landing">Landing Page</option>
+              <option value="webapp">Web App</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="site-status">Status</label>
+            <select id="site-status">
+              <option value="active">Active</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Site</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
